@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 """
 Usage:
-  virt-backup.py VMNAME DEST
+  virt-backup.py VMNAME DISKIMG DEST
 
 Options:
   -h --help     Show this screen.
   VMNAME	Name of the host
+  DISKIMG	Name of the disk to backup
   DEST		Destination dir or url for rsync
 """
 import libvirt
@@ -29,31 +30,28 @@ def main():
 	if arguments['VMNAME'] is None:
 		print( "pls give me a VM Name" )
 		sys.exit(0)
+	if arguments['DISKIMG'] is None:
+		print( "pls give me a VM Diskimage" )
+		sys.exit(0)
 	if arguments['DEST'] is None:
 		print( "pls give me a DEST" )
 		sys.exit(0)
 
 	DEST = arguments['DEST']
+	DISKIMG = arguments['DISKIMG']
 
 	conn = libvirt.open( "qemu:///system" )  # $LIBVIRT_DEFAULT_URI, or give a URI here
 	assert conn, 'Failed to open connection'
-	#VMNAME = "SAGE_vm"
 	VMNAME = arguments['VMNAME']
 	vm = conn.lookupByName( VMNAME )
 	state, maxmem, mem, ncpu, cputime = vm.info()
 	print( "VM State:", states.get(state, state) )
-	vm_vol_path = conn.storagePoolLookupByName( 'default' ).storageVolLookupByName( VMNAME ).path()
-	vm_vol = "%s/*" % ( vm_vol_path )
-
-	#print( dir(vm) )
-	#print( dir(conn) )
-	#print( vm.name() )
+	vm_vol = conn.storagePoolLookupByName( 'default' ).storageVolLookupByName( DISKIMG ).path()
 
 	if "running" in states.get(state, state): 
 
 		print( "send %s to suspend" % VMNAME )
 		vm.suspend()
-
 		while "paused by user" not in states.get(state, state):
 			state, maxmem, mem, ncpu, cputime = vm.info()
 
@@ -63,7 +61,6 @@ def main():
 		os.system( "rsync -avrP %s %s" % ( vm_vol, DEST ) ) 
 		print( "start %s again" % VMNAME )
 		vm.resume()
-
 
 if __name__ == "__main__":
 	main()
