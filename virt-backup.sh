@@ -17,6 +17,9 @@ then
 	echo 1. SAGE VM
 	bin/python virt-backup.py SAGE SAGE_vm.img /mnt/bak/SAGE
 	echo -------------------------------------------
+	echo 2. redmine VM
+	bin/python virt-backup.py redmine redmine.img /mnt/bak/redmine
+	echo -------------------------------------------
 	echo
 	echo All done!
 	echo -n Date:

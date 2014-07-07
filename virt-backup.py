@@ -57,8 +57,8 @@ def main():
 
 		print( "%s is in state: %s" % (VMNAME, states.get(state, state)) )
 		print( "sync %s to %s" % ( vm_vol, DEST ) )
-		#print( "rsync -avrP %s %s" % ( vm_vol, DEST ) ) 
-		os.system( "rsync -avrP %s %s" % ( vm_vol, DEST ) ) 
+		#print( "rsync -avP %s %s" % ( vm_vol, DEST ) ) 
+		os.system( "rsync -avP %s %s" % ( vm_vol, DEST ) ) 
 		print( "start %s again" % VMNAME )
 		vm.resume()
 
